@@ -6,7 +6,10 @@ import 'base_model/note_class.dart';
 import 'controllers/note_controller.dart';
 
 class DetailScreen extends StatelessWidget {
+  final GlobalKey<FormState> _titleKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> _contentKey = GlobalKey<FormState>();
   final Note note;
+
   DetailScreen({required this.note});
 
   final Rx<Color> selectedColor = Colors.white.obs;
@@ -27,29 +30,31 @@ class DetailScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(labelText: 'Title'),
-            ),
+            Textfield(
+                labeltext: "Title",
+                formKey: _titleKey,
+                controller: titleController),
             SizedBox(height: 16),
-            TextField(
-              controller: contentController,
-              decoration: InputDecoration(labelText: 'Content'),
-              maxLines: null,
-            ),
+            Textfield(
+                labeltext: "Content",
+                formKey: _contentKey,
+                controller: contentController),
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () {
-                final updatedNote = Note(
-                  id: note.id,
-                  title: titleController.text,
-                  content: contentController.text,
-                  color: selectedColor.value,
-                );
+                if (_titleKey.currentState!.validate() &&
+                    _contentKey.currentState!.validate()) {
+                  final updatedNote = Note(
+                    id: note.id,
+                    title: titleController.text,
+                    content: contentController.text,
+                    color: selectedColor.value,
+                  );
 
-                NoteService.addOrUpdateNote(updatedNote);
-                Get.back();
-                Get.find<NoteController>().fetchNotes();
+                  NoteService.addOrUpdateNote(updatedNote);
+                  Get.back();
+                  Get.find<NoteController>().fetchNotes();
+                }
               },
               child: Text('Save'),
             ),
@@ -121,4 +126,31 @@ class DetailScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+Widget Textfield({
+  required String labeltext,
+  required GlobalKey<FormState> formKey,
+  required TextEditingController controller,
+}) {
+  return Container(
+    margin: const EdgeInsets.all(10),
+    child: Form(
+        key: formKey,
+        child: TextFormField(
+          controller: controller,
+          validator: (value) {
+            if (value!.isEmpty) {
+              return 'Please enter Detail.....';
+            }
+            return null;
+          },
+          decoration: InputDecoration(
+            label: Text(labeltext),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        )),
+  );
 }

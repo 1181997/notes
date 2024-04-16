@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
-import 'package:notes/home_page.dart';
 import 'package:notes/page_view.dart';
 
 void main() {

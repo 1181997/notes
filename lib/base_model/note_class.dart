@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -8,15 +6,15 @@ class Note {
   final String title;
   final String content;
   Color color;
-   RxBool isFavourite;
+  RxBool isFavourite;
 
   Note({
     this.id,
-    required this.title ,
+    required this.title,
     required this.content,
     required this.color,
     bool isFavourite = false,
-  }): isFavourite = isFavourite.obs;
+  }) : isFavourite = isFavourite.obs;
 
   factory Note.empty() {
     return Note(
@@ -24,6 +22,7 @@ class Note {
       title: '',
       content: '',
       color: Colors.white,
+      isFavourite: false,
     );
   }
 
@@ -37,6 +36,7 @@ class Note {
       'title': title,
       'content': content,
       'color': color.value,
+      'isFavourite': isFavourite.value ? 1 : 0,
     };
   }
 }

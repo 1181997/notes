@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
@@ -27,7 +26,8 @@ class NoteService {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
             content TEXT,
-            color INTEGER
+            color INTEGER,
+            isFavourite INTEGER DEFAULT 0
           )
           ''',
         );
@@ -46,11 +46,13 @@ class NoteService {
       } else {
         noteColor = Colors.white;
       }
+
       return Note(
         id: maps[i]['id'],
         title: maps[i]['title'],
         content: maps[i]['content'],
         color: noteColor,
+        isFavourite: (maps[i]['isFavourite'] == 1 ? true : false),
       );
     });
   }
@@ -60,18 +62,19 @@ class NoteService {
     print(note.id);
     if (note.id != null && note.id != 0) {
       await db.rawUpdate(
-        'UPDATE $tableName SET title = ?, content = ? ,color =? WHERE id = ?',
+        'UPDATE $tableName SET title = ?, content = ? ,color =?,isFavourite = ? WHERE id = ?',
         [
           note.title,
           note.content,
           note.color.value,
+          note.isFavourite.value ? 1 : 0,
           note.id,
         ],
       );
     } else {
       int id = await db.rawInsert(
-        'INSERT INTO $tableName (title, content) VALUES (?, ?)',
-        [note.title, note.content],
+        'INSERT INTO $tableName (title, content, isFavourite) VALUES (?, ?, ?)',
+        [note.title, note.content, note.isFavourite.value ? 1 : 0],
       );
       note.id = id;
     }

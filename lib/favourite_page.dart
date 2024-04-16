@@ -1,8 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
-
+import 'base_model/note_class.dart';
 import 'controllers/note_controller.dart';
 import 'detail_screen.dart';
 
@@ -13,6 +11,10 @@ class FavoritePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    List<Note> favoriteNotes = noteController.favoriteNotes
+        .where((note) => note.isFavourite.value) // Filter only favorite notes
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Favorite Notes'),
@@ -30,9 +32,9 @@ class FavoritePage extends StatelessWidget {
       body: Obx(
         () => Get.find<NoteController>().isListView.value
             ? ListView.builder(
-                itemCount: noteController.favoriteNotes.length,
+                itemCount: favoriteNotes.length,
                 itemBuilder: (context, index) {
-                  final note = noteController.favoriteNotes[index];
+                  final note = favoriteNotes[index];
                   return ListTile(
                     title: Text(note.title),
                     subtitle: Text(note.content),
@@ -63,9 +65,9 @@ class FavoritePage extends StatelessWidget {
                   crossAxisSpacing: 10,
                   mainAxisSpacing: 10,
                 ),
-                itemCount: noteController.favoriteNotes.length,
+                itemCount: favoriteNotes.length,
                 itemBuilder: (context, index) {
-                  final note = noteController.favoriteNotes[index];
+                  final note = favoriteNotes[index];
                   return GestureDetector(
                     onTap: () {
                       Get.to(() => DetailScreen(note: note));

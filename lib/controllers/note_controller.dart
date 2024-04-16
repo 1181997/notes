@@ -31,6 +31,7 @@ class NoteController extends GetxController {
   void toggleFavorite(int noteId) {
     final note = notes.firstWhere((note) => note.id == noteId);
     note.isFavourite.value = !note.isFavourite.value;
+    NoteService.addOrUpdateNote(note);
   }
 
   List<Note> get favoriteNotes =>
