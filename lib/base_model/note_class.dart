@@ -7,6 +7,7 @@ class Note {
   final String content;
   Color color;
   RxBool isFavourite;
+  RxBool isSelected;
 
   Note({
     this.id,
@@ -14,7 +15,8 @@ class Note {
     required this.content,
     required this.color,
     bool isFavourite = false,
-  }) : isFavourite = isFavourite.obs;
+    bool isSelected = false,
+  }) : isFavourite = isFavourite.obs,isSelected = isSelected.obs;
 
   factory Note.empty() {
     return Note(

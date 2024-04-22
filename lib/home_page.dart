@@ -17,6 +17,31 @@ class HomePage extends StatelessWidget {
         title: Text('My Notes'),
         actions: [
           IconButton(
+            icon: Obx(
+              () => Icon(Get.find<NoteController>().isAnyNoteSelected.value
+                  ? Icons.delete
+                  : null),
+            ),
+            onPressed: () {
+              noteController.deleteSelectedNotes();
+              noteController.isAnyNoteSelected.value = false;
+              noteController.fetchNotes();
+            },
+          ),
+          IconButton(
+            icon: Obx(
+              () => Icon(Get.find<NoteController>().isAnyNoteSelected.value
+                  ? Icons.favorite
+                  : null),
+            ),
+            onPressed: () {
+
+              noteController.toggleFavoriteSelectedNotes();
+              noteController.isAnyNoteSelected.value = false;
+              noteController.fetchNotes();
+            },
+          ),
+          IconButton(
             icon: Obx(() => Icon(Get.find<NoteController>().isListView.value
                 ? Icons.grid_view
                 : Icons.list)),
@@ -32,28 +57,44 @@ class HomePage extends StatelessWidget {
                 itemCount: noteController.notes.length,
                 itemBuilder: (context, index) {
                   final note = noteController.notes[index];
-                  return ListTile(
-                    title: Text(note.title),
-                    subtitle: Text(note.content),
-                    tileColor: note.color,
-                    trailing: Obx(() => IconButton(
-                          icon: Icon(
-                            note.isFavourite.value
-                                ? Icons.favorite
-                                : Icons.favorite_border,
-                            color: note.isFavourite.value
-                                ? Colors.red
-                                : Colors.grey,
+                  return Obx(() => GestureDetector(
+                        onLongPress: () {
+                          print("press");
+                          Get.find<NoteController>()
+                              .toggleSelection(note.id ?? 0);
+                        },
+                        child: Card(
+                          color:
+                              note.isSelected.value ? Colors.grey : note.color,
+                          // color: note.color,
+                          child: ListTile(
+                            title: Text(note.title),
+                            subtitle: Text(note.content),
+                            trailing: Obx(() => IconButton(
+                                  icon: Icon(
+                                    note.isFavourite.value
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: note.isFavourite.value
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    Get.find<NoteController>()
+                                        .toggleFavorite(note.id ?? 0);
+                                  },
+                                )),
+                            onTap: () {
+                              if (noteController.isAnyNoteSelected.value) {
+                                Get.find<NoteController>()
+                                    .toggleSelection(note.id ?? 0);
+                              } else {
+                                Get.to(() => DetailScreen(note: note));
+                              }
+                            },
                           ),
-                          onPressed: () {
-                            Get.find<NoteController>()
-                                .toggleFavorite(note.id ?? 0);
-                          },
-                        )),
-                    onTap: () {
-                      Get.to(() => DetailScreen(note: note));
-                    },
-                  );
+                        ),
+                      ));
                 },
               )
             : GridView.builder(
@@ -65,40 +106,50 @@ class HomePage extends StatelessWidget {
                 ),
                 itemBuilder: (context, index) {
                   final note = noteController.notes[index];
-                  return GestureDetector(
-                    child: Card(
-                      color: note.color,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(note.title),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text(note.content),
-                          Obx(
-                            () => IconButton(
-                              icon: Icon(
-                                note.isFavourite.value
-                                    ? Icons.favorite
-                                    : Icons.favorite_border,
-                                color: note.isFavourite.value
-                                    ? Colors.red
-                                    : Colors.grey,
+                  return Obx(() => GestureDetector(
+                        onLongPress: () {
+                          Get.find<NoteController>()
+                              .toggleSelection(note.id ?? 0);
+                        },
+                        child: Card(
+                          color:
+                              note.isSelected.value ? Colors.grey : note.color,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(note.title),
+                              SizedBox(
+                                height: 10,
                               ),
-                              onPressed: () {
-                                Get.find<NoteController>()
-                                    .toggleFavorite(note.id ?? 0);
-                              },
-                            ),
-                          )
-                        ],
-                      ),
-                    ),
-                    onTap: () {
-                      Get.to(() => DetailScreen(note: note));
-                    },
-                  );
+                              Text(note.content),
+                              Obx(
+                                () => IconButton(
+                                  icon: Icon(
+                                    note.isFavourite.value
+                                        ? Icons.favorite
+                                        : Icons.favorite_border,
+                                    color: note.isFavourite.value
+                                        ? Colors.red
+                                        : Colors.grey,
+                                  ),
+                                  onPressed: () {
+                                    Get.find<NoteController>()
+                                        .toggleFavorite(note.id ?? 0);
+                                  },
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
+                        onTap: () {
+                          if (noteController.isAnyNoteSelected.value) {
+                            Get.find<NoteController>()
+                                .toggleSelection(note.id ?? 0);
+                          } else {
+                            Get.to(() => DetailScreen(note: note));
+                          }
+                        },
+                      ));
                 },
               ),
       ),
